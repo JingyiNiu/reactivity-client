@@ -1,17 +1,16 @@
 import { Button, Item, Label, Segment } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
+import { Link } from "react-router-dom";
+import { SyntheticEvent } from "react";
 
 interface Props {
   activities: Activity[];
-  selectActivity: (id: string) => void;
-  deleteActivity: (id: string) => void;
 }
 
-export default function ActivityList({
-  activities,
-  selectActivity,
-  deleteActivity,
-}: Props) {
+export default function ActivityList({ activities }: Props) {
+  function handleDeleteActivity(e: SyntheticEvent<HTMLButtonElement>, id: string) {
+    console.log("DELETE", id);
+}
   return (
     <Segment>
       <Item.Group divided>
@@ -27,18 +26,8 @@ export default function ActivityList({
                 </div>
               </Item.Description>
               <Item.Extra>
-                <Button
-                  floated="right"
-                  content="View"
-                  color="blue"
-                  onClick={() => selectActivity(activity.id)}
-                />
-                <Button
-                  floated="right"
-                  content="Delete"
-                  color="red"
-                  onClick={() => deleteActivity(activity.id)}
-                />
+                <Button as={Link} to={`/activities/${activity.id}`} floated="right" content="View" color="blue" />
+                <Button onClick={(e) => handleDeleteActivity(e, activity.id)} floated="right" content="Delete" color="red"/>
                 <Label basic content={activity.category} />
               </Item.Extra>
             </Item.Content>

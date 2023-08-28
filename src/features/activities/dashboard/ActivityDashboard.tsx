@@ -1,57 +1,30 @@
 import { Grid } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
 import ActivityList from "./ActivityList";
-import ActivityForm from "../form/ActivityForm";
-import ActivityDetails from "../details/ActivityDetails";
+import { useEffect, useState } from "react";
+import agent from "../../../app/api/agent";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
 
-interface Props {
-  activities: Activity[];
-  selectedActivity: Activity | undefined;
-  selectActivity: (id: string) => void;
-  cancelSelectActivity: () => void;
-  openForm: (id: string) => void;
-  closeForm: () => void;
-  editMode: boolean;
-  createOrEdit: (activity: Activity) => void;
-  deleteActivity: (id: string) => void;
-}
+const ActivityDashboard = () => {
+  const [loading, setLoading] = useState(true);
+  const [activities, setActivities] = useState<Activity[]>([]);
 
-const ActivityDashboard = (props: Props) => {
-  const {
-    activities,
-    selectedActivity,
-    selectActivity,
-    cancelSelectActivity,
-    openForm,
-    closeForm,
-    editMode,
-    createOrEdit,
-    deleteActivity,
-  } = props;
+  useEffect(() => {
+    agent.Activities.list().then((response) => {
+      setActivities(response);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) return <LoadingComponent content="Loading app..." />;
+
   return (
     <Grid>
       <Grid.Column width="10">
-        <ActivityList
-          activities={activities}
-          selectActivity={selectActivity}
-          deleteActivity={deleteActivity}
-        />
+        <ActivityList activities={activities} />
       </Grid.Column>
       <Grid.Column width="6">
-        {selectedActivity && !editMode && (
-          <ActivityDetails
-            activity={selectedActivity}
-            cancelSelectActivity={cancelSelectActivity}
-            openForm={openForm}
-          />
-        )}
-        {editMode && (
-          <ActivityForm
-            closeForm={closeForm}
-            activity={selectedActivity}
-            createOrEdit={createOrEdit}
-          />
-        )}
+        <h2>Activity filters</h2>
       </Grid.Column>
     </Grid>
   );
