@@ -8,10 +8,12 @@ function App() {
 
   return (
     <>
-      {location.pathname === '/' ? <HomePage /> : (
+      {location.pathname === "/" ? (
+        <HomePage />
+      ) : (
         <>
           <NavBar />
-          <Container style={{ marginTop: '7em' }}>
+          <Container style={{ marginTop: "7em" }}>
             <Outlet />
           </Container>
         </>

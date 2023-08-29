@@ -1,22 +1,20 @@
 import { Grid } from "semantic-ui-react";
-import { Activity } from "../../../app/models/activity";
 import ActivityList from "./ActivityList";
-import { useEffect, useState } from "react";
-import agent from "../../../app/api/agent";
+import { useEffect } from "react";
 import LoadingComponent from "../../../app/layout/LoadingComponent";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { listActivities } from "../../../redux/slices/activitySlice";
 
 const ActivityDashboard = () => {
-  const [loading, setLoading] = useState(true);
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const dispatch = useAppDispatch();
+
+  const { activities, initialLoading } = useAppSelector((state) => state.activity);
 
   useEffect(() => {
-    agent.Activities.list().then((response) => {
-      setActivities(response);
-      setLoading(false);
-    });
+    if (!activities.length) dispatch(listActivities());
   }, []);
 
-  if (loading) return <LoadingComponent content="Loading app..." />;
+  if (initialLoading) return <LoadingComponent content="Loading app..." />;
 
   return (
     <Grid>
