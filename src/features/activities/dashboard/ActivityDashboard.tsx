@@ -1,28 +1,21 @@
 import { Grid } from "semantic-ui-react";
 import ActivityList from "./ActivityList";
-import { useEffect } from "react";
 import LoadingComponent from "../../../app/layout/LoadingComponent";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { listActivities } from "../../../redux/slices/activitySlice";
+import { useAppSelector } from "../../../redux/hooks";
+import ActivityFilter from "./ActivityFilter";
 
 const ActivityDashboard = () => {
-  const dispatch = useAppDispatch();
-
-  const { activities, initialLoading } = useAppSelector((state) => state.activity);
-
-  useEffect(() => {
-    if (!activities.length) dispatch(listActivities());
-  }, []);
+  const { initialLoading } = useAppSelector((state) => state.activity);
 
   if (initialLoading) return <LoadingComponent content="Loading app..." />;
 
   return (
     <Grid>
       <Grid.Column width="10">
-        <ActivityList activities={activities} />
+        <ActivityList />
       </Grid.Column>
       <Grid.Column width="6">
-        <h2>Activity filters</h2>
+        <ActivityFilter />
       </Grid.Column>
     </Grid>
   );

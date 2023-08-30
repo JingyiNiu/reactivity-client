@@ -2,6 +2,7 @@ import App from "../layout/App";
 import { Navigate, RouteObject, createBrowserRouter } from "react-router-dom";
 import Login from "../../features/users/Login";
 import Register from "../../features/users/Register";
+import ErrorMessage from "../../features/errors/ErrorMessage";
 import NotFound from "../../features/errors/NotFound";
 import ServerError from "../../features/errors/ServerError";
 import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
@@ -19,6 +20,7 @@ const routes: RouteObject[] = [
       { path: "manage/:id", element: <ActivityForm key="manage" /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
+      { path: "error", element: <ErrorMessage /> },
       { path: "not-found", element: <NotFound /> },
       { path: "server-error", element: <ServerError /> },
       { path: "*", element: <Navigate replace to="/not-found" /> },

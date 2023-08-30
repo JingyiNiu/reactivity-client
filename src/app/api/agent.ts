@@ -1,5 +1,6 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { Activity } from "../models/activity";
+import { router } from "../router/Routes";
 
 const sleep = (delay: number) => {
   return new Promise((resolve) => {
@@ -12,17 +13,29 @@ const instance = axios.create({
   timeout: 5000,
 });
 
-const responseBody = <T>(response: AxiosResponse<T>) => response.data;
-
-instance.interceptors.response.use(async (response) => {
-  try {
+instance.interceptors.response.use(
+  async (response) => {
     await sleep(500);
     return response;
-  } catch (error) {
-    console.log(error);
-    return await Promise.reject(error);
+  },
+  (error: AxiosError) => {
+    const { data } = error.response as AxiosResponse;
+    if (data.errors) {
+      const modalStateErrors = [];
+      for (const key in data.errors) {
+        if (data.errors[key]) {
+          modalStateErrors.push(data.errors[key]);
+        }
+      }
+      const customError = new Error("Request failed with errors");
+      customError.message = modalStateErrors.flat().join(", ");
+      throw customError;
+    }
+    return Promise.reject(error);
   }
-});
+);
+
+const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 const requests = {
   get: <T>(url: string) => instance.get<T>(url).then(responseBody),

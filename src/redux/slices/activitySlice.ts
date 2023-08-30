@@ -4,16 +4,20 @@ import agent from "../../app/api/agent";
 
 interface ActivityState {
   activities: Activity[];
+  groupedActivities: any[];
   selectedActivity: Activity | undefined;
   loading: boolean;
   initialLoading: boolean;
+  errorMessage: string | undefined;
 }
 
 const initialState: ActivityState = {
   activities: [],
+  groupedActivities: [],
   selectedActivity: undefined,
   loading: false,
   initialLoading: false,
+  errorMessage: undefined,
 };
 
 const activitySlice = createSlice({
@@ -38,6 +42,7 @@ const activitySlice = createSlice({
       .addCase(listActivities.fulfilled, (state, { payload }) => {
         state.initialLoading = false;
         state.activities = payload;
+        state.groupedActivities = gronpActivity(payload);
       })
       .addCase(getActivity.pending, (state) => {
         state.initialLoading = true;
@@ -45,6 +50,10 @@ const activitySlice = createSlice({
       .addCase(getActivity.fulfilled, (state, { payload }) => {
         state.initialLoading = false;
         state.selectedActivity = payload;
+      })
+      .addCase(getActivity.rejected, (state, { error }) => {
+        state.initialLoading = false;
+        state.errorMessage = error.message;
       })
       .addCase(createActivity.pending, (state) => {
         state.loading = true;
@@ -66,6 +75,18 @@ const activitySlice = createSlice({
       });
   },
 });
+
+const gronpActivity = (activities: Activity[]) => {
+  const sortedActivities = Array.from(activities.values()).sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+  const groupedActivities = Object.entries(
+    sortedActivities.reduce((activities, activity) => {
+      const date = activity.date.split("T")[0];
+      activities[date] = activities[date] ? [...activities[date], activity] : [activity];
+      return activities;
+    }, {} as { [key: string]: Activity[] })
+  );
+  return groupedActivities;
+};
 
 export const listActivities = createAsyncThunk("activities/list", async () => {
   const res = await agent.Activities.list();
