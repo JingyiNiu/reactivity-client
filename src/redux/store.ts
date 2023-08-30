@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { activityReducer } from "./slices/activitySlice";
-import { errorReducer } from "./slices/ErrorSlice";
+import { userReducer } from "./slices/userSlice";
+import { commonReducer } from "./slices/commonSlice";
 
 export const store = configureStore({
   reducer: {
-    error: errorReducer,
+    common: commonReducer,
     activity: activityReducer,
+    user: userReducer,
   },
 });
 

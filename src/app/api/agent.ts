@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { Activity } from "../models/activity";
-import { router } from "../router/Routes";
+import { User, UserFormValues } from "../models/user";
 
 const sleep = (delay: number) => {
   return new Promise((resolve) => {
@@ -11,6 +11,12 @@ const sleep = (delay: number) => {
 const instance = axios.create({
   baseURL: "http://localhost:5000/api",
   timeout: 5000,
+});
+
+instance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('jwt');
+  if (token && config.headers) config.headers.Authorization = `Bearer ${token}`;
+  return config;
 });
 
 instance.interceptors.response.use(
@@ -52,8 +58,15 @@ const Activities = {
   delete: (id: string) => requests.del<void>(`/activities/${id}`),
 };
 
+const Account = {
+  current: () => requests.get<User>("account"),
+  login: (user: UserFormValues) => requests.post<User>("/account/login", user),
+  register: (user: UserFormValues) => requests.post<User>("/account/register", user),
+};
+
 const agent = {
   Activities,
+  Account,
 };
 
 export default agent;

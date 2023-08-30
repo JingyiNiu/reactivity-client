@@ -7,7 +7,7 @@ import ActivityFilter from "./ActivityFilter";
 const ActivityDashboard = () => {
   const { initialLoading } = useAppSelector((state) => state.activity);
 
-  if (initialLoading) return <LoadingComponent content="Loading app..." />;
+  if (initialLoading) return <LoadingComponent content="Loading activities..." />;
 
   return (
     <Grid>
