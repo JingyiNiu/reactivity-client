@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Activity } from "../../app/models/activity";
 import agent from "../../app/api/agent";
+import { utcToLocal } from "../../app/utils/util";
+import { store } from "../store";
 
 interface ActivityState {
   activities: Activity[];
@@ -42,7 +44,7 @@ const activitySlice = createSlice({
       .addCase(listActivities.fulfilled, (state, { payload }) => {
         state.initialLoading = false;
         state.activities = payload;
-        state.groupedActivities = gronpActivity(payload);
+        state.groupedActivities = groupActivity(payload);
       })
       .addCase(getActivity.pending, (state) => {
         state.initialLoading = true;
@@ -76,7 +78,7 @@ const activitySlice = createSlice({
   },
 });
 
-const gronpActivity = (activities: Activity[]) => {
+const groupActivity = (activities: Activity[]) => {
   const sortedActivities = Array.from(activities.values()).sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
   const groupedActivities = Object.entries(
     sortedActivities.reduce((activities, activity) => {
@@ -90,11 +92,19 @@ const gronpActivity = (activities: Activity[]) => {
 
 export const listActivities = createAsyncThunk("activities/list", async () => {
   const res = await agent.Activities.list();
-  return res;
+  const formattedActivities = res.map((item: Activity) => {
+    return {
+      ...item,
+      date: utcToLocal(item.date, ""),
+      host: item.attendees?.find((x) => x.username === item.hostUsername),
+    };
+  });
+  return formattedActivities;
 });
 
 export const getActivity = createAsyncThunk("activities/get", async (id: string) => {
   const res = await agent.Activities.details(id);
+  res.host = res.attendees?.find((x) => x.username === res.hostUsername);
   return res;
 });
 

@@ -1,14 +1,20 @@
 import { Link } from "react-router-dom";
-import { Item, Button, Icon, Segment, Grid } from "semantic-ui-react";
+import { Item, Button, Icon, Segment, Grid, Label } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
 import { utcToLocal as formatDate } from "../../../app/utils/util";
 import ActivityListItemAttendee from "./ActivityListItemAttendee";
+import { useAppSelector } from "../../../redux/hooks";
 
 interface Props {
   activity: Activity;
 }
 
 const ActivityListItem = ({ activity }: Props) => {
+  const { user } = useAppSelector((state) => state.user);
+
+  const isHost = activity.host?.username === user?.username;
+  const isGoing = activity.attendees!.some((a) => a.username === user?.username);
+
   return (
     <Segment.Group>
       <Segment>
@@ -17,7 +23,21 @@ const ActivityListItem = ({ activity }: Props) => {
             <Item.Image size="tiny" circular src="/assets/user.png" />
             <Item.Content>
               <Item.Header as="a">{activity.title}</Item.Header>
-              <Item.Description>Hosted by {activity.hostUsername}</Item.Description>
+              <Item.Description>Hosted by {activity.host?.displayName}</Item.Description>
+              {isHost && (
+                <Item.Description>
+                  <Label basic color="orange">
+                    You are hosting this activity!
+                  </Label>
+                </Item.Description>
+              )}
+              {isGoing && !isHost && (
+                <Item.Description>
+                  <Label basic color="green">
+                    You are going to this activity!
+                  </Label>
+                </Item.Description>
+              )}
             </Item.Content>
           </Item>
         </Item.Group>

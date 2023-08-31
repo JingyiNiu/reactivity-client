@@ -8,6 +8,7 @@ export const login = createAsyncThunk("user/login", async (creds: UserFormValues
   const user = await agent.Account.login(creds);
   dispatch(setUser(user));
   dispatch(setToken(user.token));
+  dispatch(setLoading(false));
   return user;
 });
 
@@ -42,8 +43,8 @@ const userSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
     },
-    clearUser: (state) => {
-      state.user = null;
+    setLoading: (state, action) => {
+      state.user = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -52,9 +53,6 @@ const userSlice = createSlice({
         state.loading = true;
         state.errorMessage = "";
       })
-      .addCase(login.fulfilled, (state) => {
-        state.loading = false;
-      })
       .addCase(login.rejected, (state) => {
         state.errorMessage = "Email or password not match the records";
         state.loading = false;
@@ -62,6 +60,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser, setLoading } = userSlice.actions;
 
 export const userReducer = userSlice.reducer;

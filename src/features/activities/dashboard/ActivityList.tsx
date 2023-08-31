@@ -8,6 +8,7 @@ import { listActivities } from "../../../redux/slices/activitySlice";
 function ActivityList() {
   const { groupedActivities, activities } = useAppSelector((state) => state.activity);
 
+  console.log(activities);
   const dispatch = useAppDispatch();
   useEffect(() => {
     if (!activities.length) dispatch(listActivities());
